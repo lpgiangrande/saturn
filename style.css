@@ -1,0 +1,372 @@
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:       #020509;
+  --card-bg:  rgba(6, 14, 26, 0.82);
+  --border:   rgba(140, 185, 220, 0.14);
+  --accent:   #7BAEC8;
+  --dim:      #3d6880;
+  --bright:   #c8e4f4;
+  --text:     #8db8d0;
+  --font:     'IBM Plex Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  font-family: var(--font);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Starfield ── */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Card ── */
+.card {
+  position: relative;
+  z-index: 10;
+  width: 680px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mission-id {
+  font-size: .74rem;
+  letter-spacing: 3px;
+  color: var(--dim);
+  font-weight: 400;
+}
+.sep { color: var(--border); margin: 0 8px; }
+.planet-name {
+  font-size: .82rem;
+  letter-spacing: 5px;
+  color: var(--bright);
+  font-weight: 500;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4a9e7a;
+  box-shadow: 0 0 6px #4a9e7a;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .4; }
+}
+.status-label {
+  font-size: .66rem;
+  letter-spacing: 2.5px;
+  color: var(--dim);
+  font-weight: 400;
+}
+
+/* ── Body ── */
+.card-body {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Planet panel */
+.planet-panel {
+  padding: 24px 16px 16px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 280px;
+}
+
+#saturn {
+  display: block;
+  width: 240px;
+  height: 180px;
+  object-fit: contain;
+  /* fade edges into black */
+  mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, black 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, black 45%, transparent 100%);
+  mix-blend-mode: lighten;
+}
+
+.coord {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Crée deux colonnes */
+  gap: 12px 20px;                 /* Espace entre les éléments */
+  width: 100%;
+  padding: 0 10px;
+  margin-top: auto;               /* Pousse les coordonnées vers le bas du panel */
+}
+
+.coord-item {
+  display: flex;
+  flex-direction: column;         /* Label au dessus de la valeur */
+  gap: 4px;
+  font-size: .55rem;
+  letter-spacing: 1px;
+  color: var(--bright);
+}
+
+.coord-label {
+  color: var(--dim);              /* Le label (RA, DEC...) est plus sombre */
+  font-size: .45rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* On réduit la taille du crédit photo s'il est trop long */
+.coord-item:last-child span:last-child {
+  font-size: .50rem;
+  opacity: 0.8;
+}
+
+/* Data panel */
+.data-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 22px;
+  border-bottom: 1px solid rgba(140,185,220,0.07);
+}
+.data-row:last-child { border-bottom: none; }
+
+.data-key {
+  font-size: .67rem;
+  letter-spacing: 2.5px;
+  color: var(--dim);
+  font-weight: 400;
+}
+.data-val {
+  font-size: .80rem;
+  letter-spacing: 1px;
+  color: var(--bright);
+  font-weight: 400;
+  text-align: right;
+}
+.data-val sup { font-size: .60rem; }
+
+/* ── Transmission ── */
+.transmission {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  min-height: 58px;
+}
+
+.transmission-label {
+  font-size: .64rem;
+  letter-spacing: 2.5px;
+  color: var(--dim);
+  font-weight: 400;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.transmission-text {
+  font-size: .82rem;
+  letter-spacing: .5px;
+  color: var(--text);
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+.cursor {
+  display: inline-block;
+  width: 6px;
+  height: .78em;
+  background: var(--accent);
+  vertical-align: middle;
+  margin-left: 2px;
+  animation: blink .7s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── Footer ── */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.catalog {
+  font-size: .64rem;
+  letter-spacing: 1.8px;
+  color: var(--dim);
+  font-weight: 300;
+  opacity: .7;
+}
+
+button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  font-family: var(--font);
+  font-size: .68rem;
+  letter-spacing: 3px;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s, box-shadow .2s;
+  font-weight: 300;
+}
+button:hover {
+  color: var(--bright);
+  border-color: rgba(140,185,220,0.45);
+  box-shadow: 0 0 14px rgba(100,170,220,0.18);
+}
+button:active { transform: scale(0.98); }
+.arrow { font-style: normal; }
+
+/* ====================== MOBILE ====================== */
+@media (max-width: 700px) {
+  body {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 20px 0 40px;
+  }
+
+  .card {
+    width: 92vw;
+  }
+
+  .card-body {
+    flex-direction: column;
+  }
+
+  .planet-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px 14px;
+    min-width: unset;
+  }
+
+  #saturn {
+    width: 200px;
+    height: 150px;
+  }
+
+  .data-row {
+    padding: 8px 16px;
+  }
+
+  .data-key { font-size: .58rem; }
+  .data-val  { font-size: .68rem; }
+
+  .card-header {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .planet-name {
+    font-size: .68rem;
+    letter-spacing: 3px;
+  }
+
+  .transmission {
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+  }
+
+  .transmission-text { font-size: .70rem; }
+
+  .card-footer {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .catalog { font-size: .55rem; }
+}
+
+/* ====================== VOID ====================== */
+/* ... Base styles (Body, Header, Card, etc.) ... */
+
+/* ====================== VOID SCREEN ====================== */
+.void-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+.void-screen.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.void-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 40px;
+}
+
+/* Default state: Square cursor */
+.void-cursor {
+  display: flex;
+  width: 12px;
+  height: 1.2em;
+  background: var(--dim);
+  opacity: 0.5;
+  animation: blink .7s step-end infinite;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: var(--bright);
+}
+
+/* State after first interaction: Saturn symbol */
+.void-cursor:not(:empty) {
+  width: auto;
+  background: transparent;
+  opacity: 1;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Removed .void-cross as it is no longer used */

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAT-VI — Saturn</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <canvas id="starfield"></canvas>
+
+  <!-- Main Card Interface -->
+  <div class="card" style="opacity:0; transition: opacity 1.2s ease;">
+    <header class="card-header">
+      <div class="header-left">
+        <span class="mission-id">PLANET INDEX: 06</span>
+        <span class="sep">/</span>
+        <span class="planet-name">SATURN</span>
+      </div>
+      <div class="header-right">
+        <!-- Status dot to return to void -->
+        <span class="status-dot" onclick="enterVoid()" style="cursor:pointer;"></span>
+        <span class="status-label">STATUS: ARCHIVED</span>
+        <button class="void-btn" onclick="enterVoid()">⊗</button>
+      </div>
+    </header>
+
+    <div class="card-body">
+      <!-- Visual Panel -->
+      <div class="planet-panel">
+        <img id="saturn" src="https://science.nasa.gov/wp-content/uploads/2024/03/saturn-farewell-pia21345.jpg" alt="Saturn">
+        <div class="coord">
+          <div class="coord-item"><span class="coord-label">RA</span><span>21h 26m</span></div>
+          <div class="coord-item"><span class="coord-label">DEC</span><span>−17° 30'</span></div>
+          <div class="coord-item"><span class="coord-label">TIMESTAMP</span><span>15-09-2017</span></div>
+          <div class="coord-item"><span class="coord-label">SOURCE</span><span>NASA/JPL</span></div>
+        </div>
+      </div>
+
+      <!-- Data Grid Panel -->
+      <div class="data-panel">
+        <div class="data-row"><span class="data-key">MASS</span><span class="data-val">5.683 × 10<sup>26</sup> kg</span></div>
+        <div class="data-row"><span class="data-key">DIAMETER</span><span class="data-val">120,536 km</span></div>
+        <div class="data-row"><span class="data-key">DISTANCE</span><span class="data-val">1.43 × 10<sup>9</sup> km</span></div>
+        <div class="data-row"><span class="data-key">ORBIT</span><span class="data-val">29.46 yr</span></div>
+        <div class="data-row"><span class="data-key">MOONS</span><span class="data-val">292</span></div>
+        <div class="data-row"><span class="data-key">RINGS</span><span class="data-val">282,000 km Ø</span></div>
+        <div class="data-row"><span class="data-key">GRAVITY</span><span class="data-val">10.44 m/s²</span></div>
+        <div class="data-row"><span class="data-key">DAY</span><span class="data-val">10h 33m</span></div>
+      </div>
+    </div>
+
+    <!-- Fact Transmission Area -->
+    <div class="transmission">
+      <div class="transmission-label">DATA POINT</div>
+      <div id="output" class="transmission-text">—</div>
+    </div>
+
+    <footer class="card-footer">
+      <span class="catalog">CAT-0006 ♄ CASSINI-HUYGENS REF.</span>
+      <button onclick="generateFact()">QUERY <span class="arrow">↗</span></button>
+    </footer>
+  </div>
+
+  <!-- Loading / Void Screen -->
+  <div id="void" class="void-screen visible">
+    <div class="void-content" onclick="exitVoid()" style="flex-direction: column;">
+      <!-- Blink cursor / Planet Symbol -->
+      <span id="void-cursor" class="void-cursor"></span>
+      
+      <!-- Informational message (hidden after first entry) -->
+      <div id="void-msg" style="
+          margin-top: 25px; 
+          font-size: 0.75rem; 
+          color: var(--bright); 
+          letter-spacing: 1.5px; 
+          text-transform: uppercase;
+          opacity: 0.7; 
+          transition: opacity 1.5s ease;
+          pointer-events: none;
+          font-weight: 400;
+          text-align: center;
+      ">
+          Nothing much to find here for now... move along
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Starfield Engine ── */
+    const sfC = document.getElementById('starfield');
+    const sfX = sfC.getContext('2d');
+    let stars = [];
+
+    function resizeSF() { sfC.width = innerWidth; sfC.height = innerHeight; }
+    function initStars() {
+      stars = Array.from({ length: 260 }, () => ({
+        x: Math.random() * sfC.width,
+        y: Math.random() * sfC.height,
+        r: Math.random() * 1.1 + 0.15,
+        spd: Math.random() * 0.004 + 0.001,
+        ph: Math.random() * Math.PI * 2,
+      }));
+    }
+    function drawStars(t) {
+      sfX.clearRect(0, 0, sfC.width, sfC.height);
+      for (const s of stars) {
+        const a = 0.2 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.spd + s.ph));
+        sfX.beginPath();
+        sfX.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        sfX.fillStyle = `rgba(200,222,255,${a})`;
+        sfX.fill();
+      }
+      requestAnimationFrame(drawStars);
+    }
+    resizeSF(); initStars(); requestAnimationFrame(drawStars);
+    window.addEventListener('resize', () => { resizeSF(); initStars(); });
+
+    /* ── Floating Animation ── */
+    let ft = 0;
+    (function anim() { 
+      ft += .012; 
+      const s = document.getElementById('saturn');
+      if(s) s.style.transform = `translateY(${Math.sin(ft)*5}px)`; 
+      requestAnimationFrame(anim); 
+    })();
+
+    /* ── Fact Database & Typing ── */
+    const facts = [
+      "Saturn's ring system spans 282,000 km but is only 10–100 metres thick.",
+      "Saturn is the least dense planet in the Solar System — it would float in water.",
+      "Titan, Saturn's largest moon, is the only moon with a dense nitrogen atmosphere.",
+      "A hexagonal polar vortex at Saturn's north pole spans roughly 30,000 km.",
+      "Saturn emits approximately 2.5× more energy than it receives from the Sun.",
+      "The Cassini Division — a 4,800 km gap in the rings — is caused by Mimas's gravity.",
+      "Saturn's magnetic field is uniquely aligned with its rotation axis to within 0.06°.",
+      "Winds in Saturn's upper atmosphere reach 1,800 km/h near the equatorial belt.",
+      "292 confirmed moons orbit Saturn as of April 2026.",
+      "Saturn completes one orbit of the Sun every 29.46 Earth years.",
+      "Saturn's rings are estimated to be only 10–100 million years old.",
+      "The Voyager 1 flyby revealed that Saturn's rings consist of thousands of ringlets."
+    ];
+
+    function typeText(el, text, speed=28) {
+      el.textContent='';
+      let i=0;
+      (function tick(){
+        el.innerHTML = text.substring(0,i) + (i<=text.length ? '<span class="cursor"></span>' : '');
+        if(i++<=text.length) setTimeout(tick, speed);
+      })();
+    }
+
+    function generateFact() {
+      typeText(document.getElementById('output'), facts[Math.floor(Math.random()*facts.length)]);
+    }
+    window.onload = generateFact;
+
+    /* ── Void Transition Logic ── */
+    function exitVoid() {
+      const voidEl = document.getElementById('void');
+      const card = document.querySelector('.card');
+      const cursor = document.getElementById('void-cursor');
+      const msg = document.getElementById('void-msg');
+
+      voidEl.classList.remove('visible');
+      
+      setTimeout(() => {
+        voidEl.style.pointerEvents = 'none';
+        card.style.opacity = '1';
+        
+        // Prepare state for future return (switch to symbol, hide message)
+        cursor.textContent = '♄'; 
+        cursor.style.background = 'none'; 
+        cursor.style.fontSize = '2.2rem';
+        msg.style.opacity = '0'; 
+      }, 400);
+    }
+
+    function enterVoid() {
+      const voidEl = document.getElementById('void');
+      const card = document.querySelector('.card');
+      
+      card.style.opacity = '0';
+      setTimeout(() => {
+        voidEl.style.pointerEvents = '';
+        voidEl.classList.add('visible');
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
